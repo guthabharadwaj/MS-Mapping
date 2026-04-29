@@ -1,16 +1,16 @@
 common:
-  lid_topic: "/hesai/pandar"
-  imu_topic: "/imu/data"
+  lid_topic: "/velodyne_points"   # republished by autoware_to_velodyne.py from /sensing/lidar/pointcloud_raw_ex
+  imu_topic: "/sensing/gnss/novatel/oem7/imu/data_raw"
 
   acc_cov: 0.06498801215018458  # acc noise and bias
   b_acc_cov: 1.2085272913345782e-03
   gyr_cov: 7.628553521510558e-03   # gyro noise and bias
   b_gyr_cov: 2.510775466023761e-04
 
-  extrinsic_T: [ 0.035390573575581386096, 0.12543702425194690425,-0.13578390278350543753 ]    # from lidar to imu
-  extrinsic_R: [ 0.99934183223661661543,0.026983829416008402926,-0.024246900664397554867,
-                 -0.026891918098071015796,0.99962987774302106914,0.0041098040965415811166,
-                 0.024348782616955969635,-0.0034550594425184497884,0.99969755890679804775 ]
+  extrinsic_T: [ 1.471, 2.293, 1.278 ]    # from lidar to imu (calibrated)
+  extrinsic_R: [  0.99925572, -0.00225209,  0.02664469,
+                 -0.00166006,  0.99485878, -0.01421335,
+                 -0.03853884, -0.10124692,  0.99954392 ]
 
   odom_link: "camera_init"
   scan_filter_size: 0.2
@@ -22,8 +22,8 @@ common:
 
   # GNSS fusion (ported from LIO_SAM_6AXIS). Set useGPS=true and launch the
   # simple_gps_odom node to convert NavSatFix->ENU on /gps_odom.
-  useGPS: false
-  gps_topic: "/gnss"
+  useGPS: true
+  gps_topic: "/sensing/gnss/novatel/oem7/fix"
   gpsFrequence: 10                          # Hz, used as +/- eps when syncing GPS to lidar keyframes
   gpsCovThreshold: 2.0                      # m^2, reject GPS fix if x or y variance exceeds this
   gpsDistance: 0.5                          # m, minimum spacing between accepted GPS factors
@@ -46,7 +46,7 @@ common:
 
 
 lio:
-  lidar_type: 4                         # 1 for Livox serials LiDAR, 2 for Velodyne LiDAR, 3 for ouster LiDAR, 4 for hesai
+  lidar_type: 2                         # 1 for Livox serials LiDAR, 2 for Velodyne LiDAR, 3 for ouster LiDAR, 4 for hesai
   scan_line: 32
   scan_rate: 10                         # only need to be set for velodyne, unit: Hz,
   timestamp_unit: 0                     # the unit of time/t field in the PointCloud2 rostopic: 0-second, 1-milisecond, 2-microsecond, 3-nanosecond.
@@ -72,7 +72,7 @@ pgo:
   useRawCloud: true
   method: 2                                       # ICP for Loop closure. 0: icp 1:point2plane 2:gicp
   baseline: 0                                     # 0:F2F, 1:M2F
-  useMultiMode: true                              # true for multi-session, false for single session
+  useMultiMode: false                             # true for multi-session, false for single session (Step 1: build PK-equivalent prior from march_8)
 
   loopZOffset: 5.0                                # for escaltor
   historyKeyframeSearchRadius: 25.0

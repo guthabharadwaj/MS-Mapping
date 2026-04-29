@@ -1,22 +1,23 @@
 <launch>
     <!-- set your data config -->
     <param name="config_directory" type="string" value="$(find ms_mapping)/config/"/>
-    <param name="save_directory" type="string" value="/home/xchu/data/pose_slam_prior_result/"/>
-    <param name="map_directory" type="string" value="/home/xchu/data/prior_map/PK01/"/>
+    <param name="save_directory" type="string" value="/host_data/ms_mapping_results/march8/"/>
+    <param name="map_directory" type="string" value="/host_data/ms_mapping_results/march8/"/>
 
     <!--set your data bag path-->
-    <arg name="bag_path" default="/media/xchu/新加卷/HKUSTGZ-DATASET/2023-10-28-19-09-04-Parkinglot-RedBird02/Parkinglot-RedBird-2023-10-28-19-09-04.bag"/>
+    <arg name="bag_path" default="/host_data/march_8.bag"/>
 
-    <arg name="sequence" default="PK1-RB2-TEST"/>
+    <arg name="sequence" default="march8"/>
 
     <!-- Enable GNSS fusion: launches simple_gps_odom. The ms_mapping node also
          reads common/useGPS from the yaml to gate its own GPS subscription. -->
-    <arg name="useGPS" default="false"/>
+    <arg name="useGPS" default="true"/>
 
     <!-- set your mapping params-->
     <rosparam file="$(find ms_mapping)/config/yaml/ms.yaml" command="load"/>
     <rosparam param="common/sequence" subst_value="true">$(arg sequence)</rosparam>
 
+    <node pkg="ms_mapping" type="autoware_to_velodyne.py" name="autoware_to_velodyne" output="log"/>
     <node pkg="ms_mapping" type="fastlio" name="fastlio" output="log" required="true"/>
     <node pkg="ms_mapping" type="ms_mapping" name="ms_mapping" output="screen" required="true"/>
     <node if="$(arg useGPS)" pkg="ms_mapping" type="simple_gps_odom" name="simple_gps_odom" output="screen"/>
